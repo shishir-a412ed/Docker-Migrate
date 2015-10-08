@@ -84,7 +84,7 @@ container_export(){
 	fi
 
 	if [ -z "$exportPath" ]; then
-		exportPath="/var/lib/docker-migrate"
+		exportPath="/var/lib/docker-migrate/containers"
 	fi
 
         dockerPid=$(ps aux|grep [d]ocker|awk 'NR==1{print $2}')
@@ -144,7 +144,7 @@ container_import(){
         fi
 
         if [ -z "$importPath" ]; then
-                importPath="/var/lib/docker-migrate"
+                importPath="/var/lib/docker-migrate/containers"
         fi
 
 	dockerPid=$(ps aux|grep [d]ocker|awk 'NR==1{print $2}')
