@@ -36,8 +36,6 @@ def main():
                         help="Path for importing docker (Default: /var/lib/docker-migrate)")
 
 	args = parser.parse_args()
-	print(args)
-	exit("success")
 
 	if os.geteuid() != 0:
 		os.system("clear")
@@ -49,31 +47,31 @@ def main():
 		import_docker(args.graph, args.import_location)
 
 
-def export_docker(exportDir):
-	if not os.path.isdir(exportDir):
-		os.mkdir(exportDir)
+def export_docker(graph, export_location):
+	if not os.path.isdir(export_location):
+		os.mkdir(export_location)
 	#export docker images
-	export_images(exportDir)
+	export_images(export_location)
 	#export docker containers
-	export_containers(exportDir)
+	export_containers(export_location)
 	#export docker volumes
-	export_volumes(exportDir)
+	export_volumes(graph, export_location)
 	print("docker export completed successfully")
 
-def import_docker(importDir):
-        if not os.path.isdir(importDir):
-        	sys.exit("Specified directory {0} does not exist".format(importDir))
+def import_docker(graph, import_location):
+        if not os.path.isdir(import_location):
+        	sys.exit("Specified directory {0} does not exist".format(import_location))
 	#import docker images
-        import_images(importDir)
+        import_images(import_location)
         #import docker containers
-        import_containers(importDir)
+        import_containers(import_location)
         #import docker volumes
-        import_volumes(importDir)
+        import_volumes(graph, import_location)
 	print("docker import completed successfully")
 
-def export_images(exportDir):
-	if not os.path.isdir(exportDir + "/images"):
-        	os.mkdir(exportDir + "/images")
+def export_images(export_location):
+	if not os.path.isdir(export_location + "/images"):
+        	os.mkdir(export_location + "/images")
 	images = subprocess.check_output("docker images", shell=True)
         splitImages = images.split()[7:]  # cut off the headers
         names = []
@@ -90,36 +88,36 @@ def export_images(exportDir):
 	    else:
                 subprocess.call(
                     "docker save {0}:{1} > {2}/images/{3}-{4}.tar".format(
-                      	names[i], tags[i], exportDir, names[i].replace("/", "~"), tags[i].replace("/", "~")), shell=True)
+                      	names[i], tags[i], export_location, names[i].replace("/", "~"), tags[i].replace("/", "~")), shell=True)
 
-def export_containers(exportDir):
-	if not os.path.isdir(exportDir + "/containers"):
-            os.mkdir(exportDir + "/containers")
+def export_containers(export_location):
+	if not os.path.isdir(export_location + "/containers"):
+            os.mkdir(export_location + "/containers")
 
-def export_volumes(exportDir):
-	if not os.path.isdir(exportDir + "/volumes"):
-            os.mkdir(exportDir + "/volumes")
+def export_volumes(graph, export_location):
+	if not os.path.isdir(export_location + "/volumes"):
+            os.mkdir(export_location + "/volumes")
 	subprocess.call(
-            "tar -zcvf {0}/volumes/volumeData.tar.gz -C /var/lib/docker/volumes . > /dev/null".format(exportDir), shell=True)
-        if os.path.isdir("/var/lib/docker/vfs"):
-            subprocess.call("tar -zcvf {0}/volumes/vfsData.tar.gz -C /var/lib/docker/vfs . > /dev/null".format(exportDir), shell=True)
+            "tar -zcvf {0}/volumes/volumeData.tar.gz -C {1}/volumes . > /dev/null".format(export_location, graph), shell=True)
+        if os.path.isdir(graph + "/vfs"):
+            subprocess.call("tar -zcvf {0}/volumes/vfsData.tar.gz -C {1}/vfs . > /dev/null".format(export_location, graph), shell=True)
 
-def import_images(importDir):
-	tarballs = subprocess.check_output("ls {0}/images".format(importDir), shell=True)
+def import_images(import_location):
+	tarballs = subprocess.check_output("ls {0}/images".format(import_location), shell=True)
         splitTarballs = tarballs.split()
         for i in splitTarballs:
             print("Loading image {0}".format(i))
-            subprocess.call("docker load < {0}/images/{1}".format(importDir, i), shell=True)
+            subprocess.call("docker load < {0}/images/{1}".format(import_location, i), shell=True)
 
-def import_containers(importDir):
+def import_containers(import_location):
 	print("import_containers")
 
-def import_volumes(importDir):
+def import_volumes(graph, import_location):
 	subprocess.call(
-            "tar xzvf {0}/volumes/volumeData.tar.gz -C /var/lib/docker/volumes > /dev/null".format(importDir), shell=True)
-        if os.path.isdir("/var/lib/docker/vfs"):
+            "tar xzvf {0}/volumes/volumeData.tar.gz -C {1}/volumes > /dev/null".format(import_location, graph), shell=True)
+        if os.path.isdir(graph + "/vfs"):
             subprocess.call(
-                "tar -xzvf {0}/volumes/vfsData.tar.gz -C /var/lib/docker/vfs > /dev/null".format(importDir), shell=True)
+                "tar -xzvf {0}/volumes/vfsData.tar.gz -C {1}/vfs > /dev/null".format(import_location, graph), shell=True)
 
 main()
 
