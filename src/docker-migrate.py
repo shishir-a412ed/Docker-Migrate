@@ -64,7 +64,7 @@ def import_docker(graph, import_location):
 	#import docker images
         import_images(import_location)
         #import docker containers
-        import_containers(import_location)
+        import_containers(graph, import_location)
         #import docker volumes
         import_volumes(graph, import_location)
 	print("docker import completed successfully")
@@ -82,7 +82,7 @@ def export_images(export_location):
                 names.append(splitImages[i])
                 tags.append(splitImages[i+1])
         for i in range(0, len(names)):
-            print("Saving image {0}:{1}".format(names[i], tags[i]))
+            print("Exporting image {0}:{1}".format(names[i], tags[i]))
             if names[i] == '<none>':
             	print("This is a dangling image and will not be exported")
 	    else:
@@ -97,13 +97,14 @@ def export_containers(graph, export_location):
 	containers = subprocess.check_output("docker ps -aq", shell=True)
         splitContainers = containers.split()
 	for i in range(0, len(splitContainers)):
-		print("Saving container {0}".format(splitContainers[i]))
-		subprocess.call("/tmp/containers-migrate.sh export --container-id={0} --graph={1}".format(splitContainers[i]), shell=True)
+		print("Exporting container ID:{0}".format(splitContainers[i]))
+		subprocess.call("/tmp/containers-migrate.sh export --container-id={0} --graph={1} --export-location={2}".format(splitContainers[i], graph, export_location+"/containers"), shell=True)
 
 
 def export_volumes(graph, export_location):
 	if not os.path.isdir(export_location + "/volumes"):
             os.mkdir(export_location + "/volumes")
+	print("Exporting Volumes")
 	subprocess.call(
             "tar -zcvf {0}/volumes/volumeData.tar.gz -C {1}/volumes . > /dev/null".format(export_location, graph), shell=True)
         if os.path.isdir(graph + "/vfs"):
@@ -113,11 +114,18 @@ def import_images(import_location):
 	tarballs = subprocess.check_output("ls {0}/images".format(import_location), shell=True)
         splitTarballs = tarballs.split()
         for i in splitTarballs:
-            print("Loading image {0}".format(i))
+            print("Importing image {0}".format(i))
             subprocess.call("docker load < {0}/images/{1}".format(import_location, i), shell=True)
 
-def import_containers(import_location):
-	print("import_containers")
+def import_containers(graph, import_location):
+	if not os.path.isdir(import_location + "/containers"):
+                sys.exit("Specified directory {0} does not exist.No containers to import.".format(import_location+"/containers"))
+
+	containers = subprocess.check_output("ls {0}/containers".format(import_location), shell=True)
+	splitContainers = containers.split()
+	for i in splitContainers:
+		print("Importing container ID:{0}".format(i[8:]))	
+		subprocess.call("/tmp/containers-migrate.sh import --container-id={0} --graph={1} --import-location={2}".format(i[8:], graph, import_location+"/containers"), shell=True)
 
 def import_volumes(graph, import_location):
 	subprocess.call(
