@@ -128,6 +128,7 @@ def import_containers(graph, import_location):
 		subprocess.call("/tmp/containers-migrate.sh import --container-id={0} --graph={1} --import-location={2}".format(i[8:], graph, import_location+"/containers"), shell=True)
 
 def import_volumes(graph, import_location):
+	print("Importing Volumes")
 	subprocess.call(
             "tar xzvf {0}/volumes/volumeData.tar.gz -C {1}/volumes > /dev/null".format(import_location, graph), shell=True)
         if os.path.isdir(graph + "/vfs"):
