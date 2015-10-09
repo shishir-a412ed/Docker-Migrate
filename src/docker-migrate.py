@@ -98,7 +98,7 @@ def export_containers(graph, export_location):
         splitContainers = containers.split()
 	for i in range(0, len(splitContainers)):
 		print("Saving container {0}".format(splitContainers[i]))
-		subprocess.call("/home/smahajan/bin/containers-migrate.sh export --container-id={0}".format(splitContainers[i]), shell=True)
+		subprocess.call("/tmp/containers-migrate.sh export --container-id={0} --graph={1}".format(splitContainers[i]), shell=True)
 
 
 def export_volumes(graph, export_location):

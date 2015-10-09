@@ -117,7 +117,6 @@ container_export(){
         cd $tmpDir
         rm -rf temp
         docker rmi -f $imageID 1>/dev/null||exit 1
-	echo "Container exported succesfully"
 }
 
 container_import(){
@@ -181,8 +180,6 @@ container_import(){
 	cd $dockerRootDir
 	find . -name "*$newNotruncContainerID*" -type d -exec rename $newNotruncContainerID $oldNotruncContainerID {} +
 	find . -name "*$newNotruncContainerID*" -type f -exec rename $newNotruncContainerID $oldNotruncContainerID {} +
-	
-	echo "Container imported succesfully"
 }
 
 main "$@"
