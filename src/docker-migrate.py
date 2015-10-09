@@ -53,7 +53,7 @@ def export_docker(graph, export_location):
 	#export docker images
 	export_images(export_location)
 	#export docker containers
-	export_containers(export_location)
+	export_containers(graph, export_location)
 	#export docker volumes
 	export_volumes(graph, export_location)
 	print("docker export completed successfully")
@@ -90,9 +90,16 @@ def export_images(export_location):
                     "docker save {0}:{1} > {2}/images/{3}-{4}.tar".format(
                       	names[i], tags[i], export_location, names[i].replace("/", "~"), tags[i].replace("/", "~")), shell=True)
 
-def export_containers(export_location):
+def export_containers(graph, export_location):
 	if not os.path.isdir(export_location + "/containers"):
             os.mkdir(export_location + "/containers")
+
+	containers = subprocess.check_output("docker ps -aq", shell=True)
+        splitContainers = containers.split()
+	for i in range(0, len(splitContainers)):
+		print("Saving container {0}".format(splitContainers[i]))
+		subprocess.call("/home/smahajan/bin/containers-migrate.sh export --container-id={0}".format(splitContainers[i]), shell=True)
+
 
 def export_volumes(graph, export_location):
 	if not os.path.isdir(export_location + "/volumes"):
