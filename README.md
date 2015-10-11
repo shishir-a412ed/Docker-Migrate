@@ -12,7 +12,7 @@ To setup docker-migrate on your linux environment, do the following:
 
 	a) git clone git@github.com:shishir-a412ed/Docker-Migrate.git
 	b) cd Docker-Migrate/src
-	c) ../setup.sh
+	c) cp containers-migrate.sh tar /tmp 
 
 ## how to use docker-migrate
 
@@ -75,4 +75,5 @@ the specified directory into the new docker instance.
         
 ## author
 Primary: Shishir Mahajan, 2015
+
 Secondary Jenny Ramseyer, 2015
