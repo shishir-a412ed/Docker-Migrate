@@ -49,23 +49,31 @@ def main():
 def export_docker(graph, export_location):
 	if not os.path.isdir(export_location):
 		os.mkdir(export_location)
-	#export docker images
-	export_images(export_location)
-	#export docker containers
-	export_containers(graph, export_location)
-	#export docker volumes
-	export_volumes(graph, export_location)
+	try:
+		#export docker images
+		export_images(export_location)
+		#export docker containers
+		export_containers(graph, export_location)
+		#export docker volumes
+		export_volumes(graph, export_location)
+	except:
+		e = sys.exc_info()[0]
+		sys.exit(e)
 	print("docker export completed successfully")
 
 def import_docker(graph, import_location):
         if not os.path.isdir(import_location):
         	sys.exit("Specified directory {0} does not exist".format(import_location))
-	#import docker images
-        import_images(import_location)
-        #import docker containers
-        import_containers(graph, import_location)
-        #import docker volumes
-        import_volumes(graph, import_location)
+	try:
+		#import docker images
+        	import_images(import_location)
+        	#import docker containers
+        	import_containers(graph, import_location)
+		#import docker volumes
+		import_volumes(graph, import_location)
+	except:
+                e = sys.exc_info()[0]
+                sys.exit(e)
 	print("docker import completed successfully")
 
 def export_images(export_location):
