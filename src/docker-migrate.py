@@ -38,7 +38,6 @@ def main():
 	args = parser.parse_args()
 
 	if os.geteuid() != 0:
-		os.system("clear")
                 exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
 
 	if args.which == "exportp":
