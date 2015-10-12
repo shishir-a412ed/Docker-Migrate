@@ -90,7 +90,7 @@ container_export(){
         dockerPid=$(ps aux|grep [d]ocker|awk 'NR==1{print $2}')
         dockerCmdline=$(cat /proc/$dockerPid/cmdline)||exit 1
         if [[ $dockerCmdline =~ "-g=" ]] || [[ $dockerCmdline =~ "-g/" ]] || [[ $dockerCmdline =~ "--graph" ]];then
-                if [ -z "$dockerRootDir" ];then
+                if [ -z "$dockerRootDir" ] || [ $dockerRootDir = "/var/lib/docker" ];then
                         echo "Docker is not located at the default (/var/lib/docker) root location."
                         echo "Please provide the new root location of the docker runtime in --graph option."
         		exit 1
@@ -149,7 +149,7 @@ container_import(){
 	dockerPid=$(ps aux|grep [d]ocker|awk 'NR==1{print $2}')
         dockerCmdline=$(cat /proc/$dockerPid/cmdline)||exit 1
         if [[ $dockerCmdline =~ "-g=" ]] || [[ $dockerCmdline =~ "-g/" ]] || [[ $dockerCmdline =~ "--graph" ]];then
-                if [ -z "$dockerRootDir" ];then
+                if [ -z "$dockerRootDir" ] || [ $dockerRootDir = "/var/lib/docker" ];then
                         echo "Docker is not located at the default (/var/lib/docker) root location."
                         echo "Please provide the new root location of the docker runtime in --graph option."
                         exit 1
