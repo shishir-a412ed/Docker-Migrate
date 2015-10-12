@@ -16,7 +16,7 @@ To setup docker-migrate on your linux environment, do the following:
 
 ## how to use docker-migrate
 
-`docker-migrate -h|--help` should display the help menu.
+`./docker-migrate.py -h|--help` should display the help menu.
 
 docker-migrate has two commands: 
 
@@ -27,7 +27,7 @@ docker-migrate has two commands:
 
 `./docker-migrate.py export [-h|--help] [--graph] [--export-location]`
 	
-`docker-migrate export -h|--help` will display the help menu.
+`./docker-migrate.py export -h|--help` will display the help menu.
 
 docker-migrate export has 2 optional flags:
 
@@ -52,7 +52,7 @@ containers to the specified directory, in the /images, /volumes,
 
 `./docker-migrate.py import [-h|--help] [--graph] [--import-location]`
 
-`docker-migrate import -h|--help` will display the help menu.
+`./docker-migrate import -h|--help` will display the help menu.
 
 docker-migrate import has 2 optional flags:
 
