@@ -59,6 +59,7 @@ def export_docker(graph, export_location):
 	except:
 		e = sys.exc_info()[0]
 		sys.exit(e)
+	
 	print("docker export completed successfully")
 
 def import_docker(graph, import_location):
@@ -74,7 +75,16 @@ def import_docker(graph, import_location):
 	except:
                 e = sys.exc_info()[0]
                 sys.exit(e)
+
 	print("docker import completed successfully")
+	print("Would you like to cleanup (rm -rf {0}) the temporary directory [y/N]".format(import_location))
+	choice=sys.stdin.read(1)
+	if (choice == 'y') or (choice == 'Y'):
+	   print("Deleting {0}".format(import_location))
+	   subprocess.check_call("rm -rf {0}".format(import_location), shell=True)	
+	else:
+	   print("Cleanup operation aborted")
+	print("Please restart docker daemon for the changes to take effect")
 
 def export_images(export_location):
 	if not os.path.isdir(export_location + "/images"):
