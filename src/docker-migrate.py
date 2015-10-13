@@ -122,9 +122,9 @@ def export_volumes(graph, export_location):
             os.mkdir(export_location + "/volumes")
 	print("Exporting Volumes")
 	subprocess.check_call(
-            "tar -zcvf {0}/volumes/volumeData.tar.gz -C {1}/volumes . > /dev/null".format(export_location, graph), shell=True)
+            "tar --selinux -zcvf {0}/volumes/volumeData.tar.gz -C {1}/volumes . > /dev/null".format(export_location, graph), shell=True)
         if os.path.isdir(graph + "/vfs"):
-            subprocess.check_call("tar -zcvf {0}/volumes/vfsData.tar.gz -C {1}/vfs . > /dev/null".format(export_location, graph), shell=True)
+            subprocess.check_call("tar --selinux -zcvf {0}/volumes/vfsData.tar.gz -C {1}/vfs . > /dev/null".format(export_location, graph), shell=True)
 
 def import_images(import_location):
 	tarballs = subprocess.check_output("ls {0}/images".format(import_location), shell=True)
@@ -146,10 +146,10 @@ def import_containers(graph, import_location):
 def import_volumes(graph, import_location):
 	print("Importing Volumes")
 	subprocess.check_call(
-            "tar xzvf {0}/volumes/volumeData.tar.gz -C {1}/volumes > /dev/null".format(import_location, graph), shell=True)
+            "tar --selinux -xzvf {0}/volumes/volumeData.tar.gz -C {1}/volumes > /dev/null".format(import_location, graph), shell=True)
         if os.path.isdir(graph + "/vfs"):
             subprocess.check_call(
-                "tar -xzvf {0}/volumes/vfsData.tar.gz -C {1}/vfs > /dev/null".format(import_location, graph), shell=True)
+                "tar --selinux -xzvf {0}/volumes/vfsData.tar.gz -C {1}/vfs > /dev/null".format(import_location, graph), shell=True)
 
 main()
 
