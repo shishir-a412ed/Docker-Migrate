@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import argparse
+import dmExport as ex
+import dmImport as im
+
+def main():
+	if len(sys.argv) == 1:
+		sys.exit("""
+	docker-migrate: too few arguments.
+	Try 'docker-migrate --help' for more information.
+	""")
+
+	parser = argparse.ArgumentParser(description='docker migrate')
+	subparsers = parser.add_subparsers(help="commands")
+
+	exportp = subparsers.add_parser("export", help="export a docker instance",
+        	epilog="export a docker instance."
+        	"The export command would export docker images, containers and volumes. ")
+	exportp.set_defaults(which='exportp')
+
+	importp = subparsers.add_parser("import", help="import a docker instance",
+        	epilog="import a docker instance."
+        	"The import command would import docker images, containers and volumes. ")
+	importp.set_defaults(which='importp')
+
+	exportp.add_argument("--graph", dest="graph", default="/var/lib/docker",
+                        help="Root of the Docker runtime (Default: /var/lib/docker)")
+	exportp.add_argument("--export-location", dest="export_location", default="/var/lib/docker-migrate",
+                        help="Path for exporting docker (Default: /var/lib/docker-migrate)")
+
+	importp.add_argument("--graph", dest="graph", default="/var/lib/docker",
+                        help="Root of the Docker runtime (Default: /var/lib/docker)")
+	importp.add_argument("--import-location", dest="import_location", default="/var/lib/docker-migrate",
+                        help="Path for importing docker (Default: /var/lib/docker-migrate)")
+
+	args = parser.parse_args()
+
+	if os.geteuid() != 0:
+                exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
+
+	if args.which == "exportp":
+		ex.export_docker(args.graph, args.export_location)		
+	elif args.which == "importp":	
+		im.import_docker(args.graph, args.import_location)
+
+main()
+
+
+
+	
