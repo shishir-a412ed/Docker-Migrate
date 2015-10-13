@@ -105,7 +105,7 @@ def export_containers(graph, export_location):
         splitContainers = containers.split()
 	for i in range(0, len(splitContainers)):
 		print("Exporting container ID:{0}".format(splitContainers[i]))
-		subprocess.check_call("/tmp/containers-migrate.sh export --container-id={0} --graph={1} --export-location={2}".format(splitContainers[i], graph, export_location+"/containers"), shell=True)
+		subprocess.check_call("/usr/bin/containers-migrate.sh export --container-id={0} --graph={1} --export-location={2}".format(splitContainers[i], graph, export_location+"/containers"), shell=True)
 
 def export_volumes(graph, export_location):
 	if not os.path.isdir(export_location + "/volumes"):
@@ -131,7 +131,7 @@ def import_containers(graph, import_location):
 	splitContainers = containers.split()
 	for i in splitContainers:
 		print("Importing container ID:{0}".format(i[8:]))	
-		subprocess.check_call("/tmp/containers-migrate.sh import --container-id={0} --graph={1} --import-location={2}".format(i[8:], graph, import_location+"/containers"), shell=True)
+		subprocess.check_call("/usr/bin/containers-migrate.sh import --container-id={0} --graph={1} --import-location={2}".format(i[8:], graph, import_location+"/containers"), shell=True)
 
 def import_volumes(graph, import_location):
 	print("Importing Volumes")
