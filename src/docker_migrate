@@ -3,8 +3,7 @@
 import sys
 import os
 import argparse
-import dmExport as ex
-import dmImport as im
+from dockermigrate import export_docker, import_docker
 
 def main():
 	if len(sys.argv) == 1:
@@ -42,9 +41,9 @@ def main():
                 exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
 
 	if args.which == "exportp":
-		ex.export_docker(args.graph, args.export_location)		
+		export_docker(args.graph, args.export_location)		
 	elif args.which == "importp":	
-		im.import_docker(args.graph, args.import_location)
+		import_docker(args.graph, args.import_location)
 
 main()
 

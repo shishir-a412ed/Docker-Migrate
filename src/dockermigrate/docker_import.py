@@ -26,6 +26,7 @@ def import_docker(graph, import_location):
            print("Cleanup operation aborted")
         print("Please restart docker daemon for the changes to take effect")
 
+
 def import_images(import_location):
         tarballs = subprocess.check_output("ls {0}/images".format(import_location), shell=True)
         splitTarballs = tarballs.split()
@@ -50,4 +51,3 @@ def import_volumes(graph, import_location):
         if os.path.isdir(graph + "/vfs"):
             subprocess.check_call(
                 "tar --selinux -xzvf {0}/volumes/vfsData.tar.gz -C {1}/vfs > /dev/null".format(import_location, graph), shell=True)
-

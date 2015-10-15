@@ -18,7 +18,6 @@ def export_docker(graph, export_location):
 
         print("docker export completed successfully")
 
-
 def export_images(export_location):
         if not os.path.isdir(export_location + "/images"):
                 os.mkdir(export_location + "/images")
@@ -39,7 +38,6 @@ def export_images(export_location):
                 subprocess.check_call(
                     "docker save {0}:{1} > {2}/images/{3}-{4}.tar".format(
                         names[i], tags[i], export_location, names[i].replace("/", "~"), tags[i].replace("/", "~")), shell=True)
-
 
 def export_containers(graph, export_location):
         if not os.path.isdir(export_location + "/containers"):
