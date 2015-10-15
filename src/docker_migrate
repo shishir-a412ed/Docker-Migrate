@@ -3,7 +3,7 @@
 import sys
 import os
 import argparse
-from dockermigrate import export_docker, import_docker
+from dockermigrate import * 
 
 def main():
 	if len(sys.argv) == 1:
