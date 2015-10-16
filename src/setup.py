@@ -7,7 +7,7 @@ setup.py for docker-migrate.
 
 from setuptools import setup
 
-setup(name="docker-migrate", scripts=["docker_migrate"],
+setup(name="docker-migrate", scripts=["docker-migrate"],
       version='1.0',
       description="Tool for migrating docker from one backend storage to another",
       author="Shishir Mahajan", author_email="shishir.mahajan@redhat.com",
