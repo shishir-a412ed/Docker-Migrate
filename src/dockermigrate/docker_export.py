@@ -61,7 +61,7 @@ def export_containers(graph, export_location):
     split_containers = containers.split()
     for i in range(0, len(split_containers)):
         print("Exporting container ID:{0}".format(split_containers[i]))
-        subprocess.check_call("/usr/bin/containers-migrate.sh export --container-id={0}"
+        subprocess.check_call("/usr/lib/docker-migrate/containers-migrate.sh export --container-id={0}"
                               " --graph={1} --export-location={2}"
                               .format(split_containers[i], graph, export_location+"/containers"),
                               shell=True)
