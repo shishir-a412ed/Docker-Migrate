@@ -12,11 +12,15 @@ To setup docker-migrate on your linux environment, do the following:
 
 	a) git clone git@github.com:shishir-a412ed/Docker-Migrate.git
 	b) cd Docker-Migrate/src
-	c) cp containers-migrate.sh tar /tmp 
+	c) sudo make install
+
+To cleanup the build files once `make install` is complete, do:
+
+	a) sudo make clean  
 
 ## how to use docker-migrate
 
-`./docker-migrate.py -h|--help` should display the help menu.
+`docker-migrate -h|--help` should display the help menu.
 
 docker-migrate has two commands: 
 
@@ -25,9 +29,9 @@ docker-migrate has two commands:
         
 ## docker-migrate export
 
-`./docker-migrate.py export [-h|--help] [--graph] [--export-location]`
+`docker-migrate export [-h|--help] [--graph] [--export-location]`
 	
-`./docker-migrate.py export -h|--help` will display the help menu.
+`docker-migrate export -h|--help` will display the help menu.
 
 docker-migrate export has 2 optional flags:
 
@@ -50,9 +54,9 @@ containers to the specified directory, in the /images, /volumes,
 
 ## docker-migrate import
 
-`./docker-migrate.py import [-h|--help] [--graph] [--import-location]`
+`docker-migrate import [-h|--help] [--graph] [--import-location]`
 
-`./docker-migrate import -h|--help` will display the help menu.
+`docker-migrate import -h|--help` will display the help menu.
 
 docker-migrate import has 2 optional flags:
 
