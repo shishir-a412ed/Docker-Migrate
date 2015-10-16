@@ -106,12 +106,12 @@ container_export(){
 	echo $dockerRootDir>dockerInfo.txt
 	echo $containerBaseImageID>>dockerInfo.txt
 	echo $notruncContainerID>>dockerInfo.txt
-        /usr/bin/gotar -cf container-metadata.tar $dockerRootDir/containers/$notruncContainerID 2> /dev/null
+        /usr/lib/docker-migrate/gotar -cf container-metadata.tar $dockerRootDir/containers/$notruncContainerID 2> /dev/null
         imageID=$(docker commit $containerID)||exit 1
         mkdir $tmpDir/temp
         docker save $imageID > $tmpDir/temp/image.tar||exit 1
 	cd $tmpDir/temp
-        /usr/bin/gotar -xf image.tar
+        /usr/lib/docker-migrate/gotar -xf image.tar
         cd $tmpDir/temp/$imageID
         cp layer.tar $tmpDir/container-diff.tar
         cd $tmpDir
@@ -160,14 +160,14 @@ container_import(){
 
 	cd $importPath/migrate-$containerID
 	dockerBaseImageID=$(sed -n '2p' dockerInfo.txt)||exit 1	
-	cat container-diff.tar|docker run -i -v /usr/bin/gotar:/usr/bin/gotar $dockerBaseImageID /usr/bin/gotar -xf -
+	cat container-diff.tar|docker run -i -v /usr/lib/docker-migrate/gotar:/usr/lib/docker-migrate/gotar $dockerBaseImageID /usr/lib/docker-migrate/gotar -xf -
 	newContainerID=$(docker ps -lq)||exit 1
 	newContainerName=$(docker inspect -f '{{.Name}}' $newContainerID)||exit 1
 	newNotruncContainerID=$(docker ps -aq --no-trunc|grep $newContainerID)||exit 1					
 	cd $dockerRootDir/containers/$newNotruncContainerID
 	rm -rf *
 	cp $importPath/migrate-$containerID/container-metadata.tar .
-	/usr/bin/gotar -xf container-metadata.tar	
+	/usr/lib/docker-migrate/gotar -xf container-metadata.tar	
 	rm container-metadata.tar
 	oldDockerRootDir=$(sed -n '1p' $importPath/migrate-$containerID/dockerInfo.txt)||exit 1
 	oldNotruncContainerID=$(sed -n '3p' $importPath/migrate-$containerID/dockerInfo.txt)||exit 1
