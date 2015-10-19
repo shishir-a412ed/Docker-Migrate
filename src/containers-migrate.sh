@@ -175,6 +175,7 @@ container_import(){
 	baseDir=$(echo $oldDockerRootDir|cut -d"/" -f 2)
 	rm -rf $baseDir
 
+	sed -i "s|\"Driver\":\"devicemapper\"|\"Driver\":\"overlay\"|g" config.json	
 	sed -i "s|$oldDockerRootDir/containers/$oldNotruncContainerID|$dockerRootDir/containers/$oldNotruncContainerID|g" config.json
 
 	cd $dockerRootDir
