@@ -3,7 +3,7 @@
 set -e
 
 main() {
-if [ "$USER" != "root" ];then
+if [ $(id -u) != 0 ];then
 	echo "Run 'containers-migrate' as root user"
 	exit 
 fi
@@ -11,28 +11,34 @@ fi
 NUMARGS=$#
 
 if [ $NUMARGS -eq 0 ] || [ "$1" = "--help" ];then 
-	echo "Usage: containers-migrate COMMAND [OPTIONS]"
-	echo -e "       containers-migrate [--help]\n"
-	echo -e "A self-sufficient tool for migrating docker containers from one backend storage to another\n"
-	echo "Commands:"
-	echo "    export  Export a container from an existing storage"
-	echo "    import  Import a container into a new storage" 
+	echo "Usage: containers-migrate COMMAND [ARGS] [OPTIONS]
+       containers-migrate [--help]
+
+A self-sufficient tool for migrating docker containers from one backend storage to another
+
+Commands:
+    export  Export a container from an existing storage
+    import  Import a container into a new storage"
 	exit
 fi
 
 if [ "$1" = "export" ];then
    if [ -z "$2" ]; then
-	echo "containers-migrate: "export" requires a minimum of 1 argument." 
-	echo -e "See 'containers-migrate export --help'\n"
-	echo -e "Usage: containers-migrate export [OPTIONS]\n"
-	echo "Export a container from an existing storage"
+	echo "containers-migrate: "export" requires a minimum of 1 argument.
+See 'containers-migrate export --help'
+
+Usage: containers-migrate export CONTAINER-ID [OPTIONS]
+
+Export a container from an existing storage"
 	exit
    elif [ "$2" = "--help" ];then
-	echo -e "\nUsage: containers-migrate export [OPTIONS]\n"
-	echo -e "Export a container from an existing storage\n"
-	echo "--container-id      ID of the container to be exported" 
-	echo "--graph   	    Root of the Docker runtime (Default: /var/lib/docker)"
-	echo "--export-location   Path for exporting the container (Default: /var/lib/docker-migrate)"
+	echo "
+Usage: containers-migrate export CONTAINER-ID [OPTIONS]
+
+Export a container from an existing storage
+
+--graph   	    Root of the Docker runtime (Default: /var/lib/docker)
+--export-location   Path for exporting the container (Default: /var/lib/docker-migrate/containers)"
 	exit
    else
 	container_export $2 $3 $4
@@ -41,17 +47,21 @@ fi
 
 if [ "$1" = "import" ];then
    if [ -z "$2" ]; then
-        echo "containers-migrate: "import" requires a minimum of 1 argument." 
-        echo -e "See 'containers-migrate import --help'\n"
-        echo -e "Usage: containers-migrate import [OPTIONS]\n"
-        echo "Import a container into a new storage"
+        echo "containers-migrate: "import" requires a minimum of 1 argument.
+See 'containers-migrate import --help'
+        
+Usage: containers-migrate import CONTAINER-ID [OPTIONS]
+
+Import a container into a new storage"
         exit
    elif [ "$2" = "--help" ];then
-        echo -e "\nUsage: containers-migrate import [OPTIONS]\n"
-        echo -e "Import a container into a new storage\n"
-        echo "--container-id      ID of the container to be imported" 
-        echo "--graph             Root of the Docker runtime (Default: /var/lib/docker)"
-	echo "--import-location   Path for importing the container (Default: /var/lib/docker-migrate)"
+        echo "
+Usage: containers-migrate import CONTAINER-ID [OPTIONS]
+
+Import a container into a new storage
+
+--graph             Root of the Docker runtime (Default: /var/lib/docker)
+--import-location   Path for importing the container (Default: /var/lib/docker-migrate/containers)"
         exit
    else
         container_import $2 $3 $4
@@ -108,10 +118,9 @@ container_export(){
 	echo $notruncContainerID>>dockerInfo.txt
         /usr/lib/docker-migrate/gotar -cf container-metadata.tar $dockerRootDir/containers/$notruncContainerID 2> /dev/null
         imageID=$(docker commit $containerID)||exit 1
-        mkdir $tmpDir/temp
+        mkdir -p $tmpDir/temp
         docker save $imageID > $tmpDir/temp/image.tar||exit 1
-	cd $tmpDir/temp
-        /usr/lib/docker-migrate/gotar -xf image.tar
+	$(cd $tmpDir/temp; /usr/lib/docker-migrate/gotar -xf image.tar)
         cd $tmpDir/temp/$imageID
         cp layer.tar $tmpDir/container-diff.tar
         cd $tmpDir
