@@ -94,7 +94,7 @@ container_export(){
 	fi
 
 	if [ -z "$exportPath" ]; then
-		exportPath="/var/lib/docker-migrate/containers"
+		exportPath="/var/lib/docker-migrate"
 	fi
 
         dockerPid=$(ps aux|grep [d]ocker|awk 'NR==1{print $2}')
@@ -109,13 +109,13 @@ container_export(){
                 dockerRootDir="/var/lib/docker"
         fi
         notruncContainerID=$(docker ps -aq --no-trunc|grep $containerID)||exit 1
-        tmpDir=$exportPath/migrate-$containerID
+        tmpDir=$exportPath/containers/migrate-$containerID
         mkdir -p $tmpDir
         cd $tmpDir
 	containerBaseImageID=$(docker inspect --format '{{.Image}}' $containerID)||exit 1
-	echo $dockerRootDir>dockerInfo.txt
-	echo $containerBaseImageID>>dockerInfo.txt
-	echo $notruncContainerID>>dockerInfo.txt
+	echo $dockerRootDir>containerInfo.txt
+	echo $containerBaseImageID>>containerInfo.txt
+	echo $notruncContainerID>>containerInfo.txt
         /usr/lib/docker-migrate/gotar -cf container-metadata.tar $dockerRootDir/containers/$notruncContainerID 2> /dev/null
         imageID=$(docker commit $containerID)||exit 1
         mkdir -p $tmpDir/temp
@@ -152,7 +152,7 @@ container_import(){
         fi
 
         if [ -z "$importPath" ]; then
-                importPath="/var/lib/docker-migrate/containers"
+                importPath="/var/lib/docker-migrate"
         fi
 
 	dockerPid=$(ps aux|grep [d]ocker|awk 'NR==1{print $2}')
@@ -167,24 +167,27 @@ container_import(){
                 dockerRootDir="/var/lib/docker"
         fi
 
-	cd $importPath/migrate-$containerID
-	dockerBaseImageID=$(sed -n '2p' dockerInfo.txt)||exit 1	
+	cd $importPath/containers/migrate-$containerID
+	dockerBaseImageID=$(sed -n '2p' containerInfo.txt)||exit 1	
 	cat container-diff.tar|docker run -i -v /usr/lib/docker-migrate/gotar:/dev/shm/gotar $dockerBaseImageID /dev/shm/gotar -xf -
 	newContainerID=$(docker ps -lq)||exit 1
 	newContainerName=$(docker inspect -f '{{.Name}}' $newContainerID)||exit 1
 	newNotruncContainerID=$(docker ps -aq --no-trunc|grep $newContainerID)||exit 1					
 	cd $dockerRootDir/containers/$newNotruncContainerID
 	rm -rf *
-	cp $importPath/migrate-$containerID/container-metadata.tar .
+	cp $importPath/containers/migrate-$containerID/container-metadata.tar .
 	/usr/lib/docker-migrate/gotar -xf container-metadata.tar	
 	rm container-metadata.tar
-	oldDockerRootDir=$(sed -n '1p' $importPath/migrate-$containerID/dockerInfo.txt)||exit 1
-	oldNotruncContainerID=$(sed -n '3p' $importPath/migrate-$containerID/dockerInfo.txt)||exit 1
+	oldDockerRootDir=$(sed -n '1p' $importPath/containers/migrate-$containerID/containerInfo.txt)||exit 1
+	oldNotruncContainerID=$(sed -n '3p' $importPath/containers/migrate-$containerID/containerInfo.txt)||exit 1
 	cp -r ${oldDockerRootDir:1}/containers/$oldNotruncContainerID/* .
 	baseDir=$(echo $oldDockerRootDir|cut -d"/" -f 2)
 	rm -rf $baseDir
 
-	sed -i "s|\"Driver\":\"devicemapper\"|\"Driver\":\"overlay\"|g" config.json	
+	oldStorageDriver=$(sed -n '1p' $importPath/dockerInfo.txt)||exit 1
+	newStorageDriver=$(docker info|grep "Storage Driver"|cut -d" " -f 3)
+
+	sed -i "s|\"Driver\":\"$oldStorageDriver\"|\"Driver\":\"$newStorageDriver\"|g" config.json	
 	sed -i "s|$oldDockerRootDir/containers/$oldNotruncContainerID|$dockerRootDir/containers/$oldNotruncContainerID|g" config.json
 
 	cd $dockerRootDir

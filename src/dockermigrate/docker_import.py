@@ -59,7 +59,7 @@ def import_containers(graph, import_location):
         print("Importing container ID:{0}".format(i[8:]))
         subprocess.check_call("/usr/lib/docker-migrate/containers-migrate.sh import --container-id={0}"
                               " --graph={1} --import-location={2}"
-                              .format(i[8:], graph, import_location+"/containers"), shell=True)
+                              .format(i[8:], graph, import_location), shell=True)
 
 def import_volumes(graph, import_location):
     """

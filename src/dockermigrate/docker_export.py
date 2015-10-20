@@ -13,6 +13,12 @@ def export_docker(graph, export_location):
     if not os.path.isdir(export_location):
         os.mkdir(export_location)
     try:
+	#Save the docker storage driver
+	storage_driver = subprocess.check_output("docker info|grep \"Storage Driver\"|cut -d\" \" -f 3", shell=True)
+	file = open(export_location+"/dockerInfo.txt", "w")
+	file.write(storage_driver)
+	file.close()
+
         #export docker images
         export_images(export_location)
         #export docker containers
@@ -63,7 +69,7 @@ def export_containers(graph, export_location):
         print("Exporting container ID:{0}".format(split_containers[i]))
         subprocess.check_call("/usr/lib/docker-migrate/containers-migrate.sh export --container-id={0}"
                               " --graph={1} --export-location={2}"
-                              .format(split_containers[i], graph, export_location+"/containers"),
+                              .format(split_containers[i], graph, export_location),
                               shell=True)
 
 def export_volumes(graph, export_location):
