@@ -1,12 +1,25 @@
 # Installation Directories
+PREFIX ?= $(DESTDIR)/usr
+SYSCONFDIR ?= $(DESTDIR)/etc/sysconfig
+PROFILEDIR ?= $(DESTDIR)/etc/profile.d
 PYTHON ?= /usr/bin/python
-DESTDIR ?= /usr/lib/docker-migrate
+PYLINT ?= /usr/bin/pylint
+
+
+all: python-build
+
+test:
+	sh ./test.sh
+
+python-build: docker-migrate
+	$(PYTHON) setup.py build
+	$(PYLINT) -E --additional-builtins=_ *.py docker-migrate dockermigrate
 
 .PHONY: install 
-install:
-	$(PYTHON) setup.py install
-	mkdir -p $(DESTDIR)
-	cp containers-migrate.sh gotar $(DESTDIR)
+install: all
+	$(PYTHON) setup.py install `test -n "$(DESTDIR)" && echo --root $(DESTDIR)`
+	mkdir -p $(DESTDIR)/usr/libexec/dockermigrate
+	install containers-migrate.sh gotar $(DESTDIR)/usr/libexec/dockermigrate
 
 .PHONY: clean
 clean:
