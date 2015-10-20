@@ -169,7 +169,7 @@ container_import(){
 
 	cd $importPath/migrate-$containerID
 	dockerBaseImageID=$(sed -n '2p' dockerInfo.txt)||exit 1	
-	cat container-diff.tar|docker run -i -v /usr/lib/docker-migrate/gotar:/usr/lib/docker-migrate/gotar $dockerBaseImageID /usr/lib/docker-migrate/gotar -xf -
+	cat container-diff.tar|docker run -i -v /usr/lib/docker-migrate/gotar:/dev/shm/gotar $dockerBaseImageID /dev/shm/gotar -xf -
 	newContainerID=$(docker ps -lq)||exit 1
 	newContainerName=$(docker inspect -f '{{.Name}}' $newContainerID)||exit 1
 	newNotruncContainerID=$(docker ps -aq --no-trunc|grep $newContainerID)||exit 1					
