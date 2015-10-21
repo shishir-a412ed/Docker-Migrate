@@ -57,7 +57,7 @@ def import_containers(graph, import_location):
     split_containers = containers.split()
     for i in split_containers:
         print("Importing container ID:{0}".format(i[8:]))
-        subprocess.check_call("/usr/lib/docker-migrate/containers-migrate.sh import --container-id={0}"
+        subprocess.check_call("/usr/libexec/dockermigrate/containers-migrate.sh import --container-id={0}"
                               " --graph={1} --import-location={2}"
                               .format(i[8:], graph, import_location), shell=True)
 
