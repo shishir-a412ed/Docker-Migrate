@@ -37,24 +37,35 @@ def export_images(export_location):
     """
     if not os.path.isdir(export_location + "/images"):
         os.mkdir(export_location + "/images")
-    images = subprocess.check_output("docker images", shell=True)
-    split_images = images.split()[7:]  # cut off the headers
-    names = []
-    tags = []
-    for i in range(0, len(split_images)):
-        # only take the image and its tags and the image ID (to help in the <none>:<none> case)
-        if i % 8 == 0:
-            names.append(split_images[i])
-            tags.append(split_images[i+1])
-    for i in range(0, len(names)):
-        print("Exporting image {0}:{1}".format(names[i], tags[i]))
-        if names[i] == '<none>':
-            print("This is a dangling image and will not be exported")
-        else:
-            subprocess.check_call(
-                "docker save {0}:{1} > {2}/images/{3}-{4}.tar".format(
-                    names[i], tags[i], export_location, names[i].replace("/", "~"),
-                    tags[i].replace("/", "~")), shell=True)
+    images = subprocess.check_output("docker images|awk 'NR!=1{print $1 \":\" $2}'", shell=True)
+    ids = subprocess.check_output("docker images|awk 'NR!=1{print $3}'", shell=True)
+
+    split_images = images.split()
+    split_ids = ids.split()    
+
+    d = {}
+
+    for i in range(0, len(split_ids)):
+	if split_images[i] == '<none>:<none>':
+	   continue  
+        if split_ids[i] in d:
+          d[split_ids[i]]=[d[split_ids[i]],split_images[i]]
+    	else:
+          d[split_ids[i]]=split_images[i]
+
+    for id, images in d.iteritems():
+        print("Exporting image with id: {0}".format(id))
+	if isinstance(images, list):
+	   img = ""
+	   for i, val in enumerate(images):
+		img=img+" "+val
+	   subprocess.check_call(
+                "docker save {0} > {1}/images/{2}.tar".format(
+                    img.lstrip(), export_location, id), shell=True)
+	else:
+	   subprocess.check_call(
+                "docker save {0} > {1}/images/{2}.tar".format(
+                    images, export_location, id), shell=True)
 
 def export_containers(graph, export_location):
     """
