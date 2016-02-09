@@ -1,3 +1,7 @@
+This project has been moved under projectatomic/atomic (https://github.com/projectatomic/atomic).
+Once you install the atomic run tool, you can try this project using 
+the `atomic migrate` command.
+
 ## docker-migrate
  
 Docker migrate is a CLI tool that allows the user to easily 
